@@ -253,6 +253,9 @@ void Position::set(const string& fenStr, bool isChess960, Thread* th) {
       }
   }
 
+  st->kingSquare[WHITE] = lsb(pieces(WHITE, KING));
+  st->kingSquare[BLACK] = lsb(pieces(BLACK, KING));
+
   // 2. Active color
   ss >> token;
   sideToMove = (token == 'w' ? WHITE : BLACK);
@@ -816,6 +819,8 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
       // Reset rule 50 draw counter
       st->rule50 = 0;
   }
+  else if (pt == KING)
+      st->kingSquare[us] = to;
 
   // Update incremental scores
   st->psq += PSQT::psq[us][pt][to] - PSQT::psq[us][pt][from];
@@ -889,6 +894,9 @@ void Position::undo_move(Move m) {
 
           put_piece(~us, st->capturedType, capsq); // Restore the captured piece
       }
+
+      if (pt == KING)
+          st->kingSquare[us] = from;
   }
 
   // Finally point our state pointer back to the previous state
@@ -915,6 +923,7 @@ void Position::do_castling(Color us, Square from, Square& to, Square& rfrom, Squ
   board[Do ? from : to] = board[Do ? rfrom : rto] = NO_PIECE; // Since remove_piece doesn't do it for us
   put_piece(us, KING, Do ? to : from);
   put_piece(us, ROOK, Do ? rto : rfrom);
+  st->kingSquare[us] = Do ? to : from;
 }
 
 

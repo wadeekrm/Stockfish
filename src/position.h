@@ -67,6 +67,7 @@ struct StateInfo {
   int    pliesFromNull;
   Score  psq;
   Square epSquare;
+  Square kingSquare[2];
 
   // Not copied when making a move
   Key        key;
@@ -270,7 +271,7 @@ inline Square Position::ep_square() const {
 }
 
 inline Square Position::king_square(Color c) const {
-  return lsb(pieces(c, KING));
+  return st->kingSquare[c];
 }
 
 inline int Position::can_castle(CastlingRight cr) const {
